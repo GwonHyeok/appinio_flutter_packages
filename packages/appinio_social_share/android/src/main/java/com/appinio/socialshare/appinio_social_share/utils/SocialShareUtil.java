@@ -51,6 +51,7 @@ public class SocialShareUtil {
     private final String WHATSAPP_PACKAGE = "com.whatsapp";
     private final String TELEGRAM_PACKAGE = "org.telegram.messenger";
     private final String TIKTOK_PACKAGE = "com.zhiliaoapp.musically";
+    private final String TIKTOK_T_PACKAGE = "com.ss.android.ugc.trill";
     private final String FACEBOOK_STORY_PACKAGE = "com.facebook.stories.ADD_TO_STORY";
     private final String FACEBOOK_PACKAGE = "com.facebook.katana";
     private final String FACEBOOK_LITE_PACKAGE = "com.facebook.lite";
@@ -76,7 +77,16 @@ public class SocialShareUtil {
     }
 
     public String shareToTikTok(String imagePath, Context activity, String text) {
-        return shareFileAndTextToPackage(imagePath, text, activity, TIKTOK_PACKAGE);
+        Map<String, Boolean> apps = getInstalledApps(activity);
+        String packageName;
+        if (apps.get("tiktok")) {
+            packageName = TIKTOK_PACKAGE;
+        } else if (apps.get("tiktok-t")) {
+            packageName = TIKTOK_T_PACKAGE;
+        } else {
+            return ERROR_APP_NOT_AVAILABLE;
+        }
+        return shareFileAndTextToPackage(imagePath, text, activity, packageName);
     }
 
     public String shareToTwitter(String imagePath, Context activity, String text) {
@@ -322,6 +332,7 @@ public class SocialShareUtil {
         appsMap.put("instagram_stories", INSTAGRAM_PACKAGE);
         appsMap.put("twitter", TWITTER_PACKAGE);
         appsMap.put("tiktok", TIKTOK_PACKAGE);
+        appsMap.put("tiktok-t", TIKTOK_T_PACKAGE);
 
         Map<String, Boolean> apps = new HashMap<String, Boolean>();
 
@@ -332,7 +343,7 @@ public class SocialShareUtil {
         intent.setData(Uri.parse("sms:"));
         List<ResolveInfo> resolvedActivities = pm.queryIntentActivities(intent, 0);
         apps.put("message", !resolvedActivities.isEmpty());
-        String[] appNames = {"instagram", "facebook_stories", "whatsapp", "telegram", "messenger", "facebook","facebook-lite","messenger-lite", "instagram_stories", "twitter", "tiktok"};
+        String[] appNames = {"instagram", "facebook_stories", "whatsapp", "telegram", "messenger", "facebook", "facebook-lite", "messenger-lite", "instagram_stories", "twitter", "tiktok", "tiktok-t"};
 
         for (int i = 0; i < appNames.length; i++) {
             try {
